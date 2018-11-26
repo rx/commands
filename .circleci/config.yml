@@ -36,9 +36,13 @@ jobs:
             - ./vendor/bundle
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
 
+      # Database setup
+      - run: bundle exec rake db:create
+      - run: bundle exec rake db:schema:load
+
       # run tests!
       - run:
-          name: run specs
+          name: run tests
           command: |
             mkdir /tmp/test-results
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
@@ -55,6 +59,3 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
-      - store_artifacts:
-          path: ./coverage
-          destination: code-coverage
